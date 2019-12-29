@@ -1,2 +1,4 @@
 .vagrant/
 tmp/
+*.img
+*.log

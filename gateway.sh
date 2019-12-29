@@ -234,71 +234,11 @@ systemctl restart atftpd
 
 apt-get install -y nfs-kernel-server
 
+# dump the supported nfs versions.
+cat /proc/fs/nfsd/versions | tr ' ' "\n" | grep '^+' | tr '+' 'v'
 
-#
-# setup the root fs from raspbian.
-# see http://downloads.raspberrypi.org/raspbian/archive/
-
-raspbian_version='2019-09-30-15:24'
-for n in boot root; do
-  cache_path="/vagrant/tmp/cache/$(echo "$raspbian_version" | sed -E 's,[^0-9],,g')/$n.tar.xz"
-  if [ ! -f $cache_path ]; then
-    wget -q -O /tmp/raspbian-cache.tmp "https://downloads.raspberrypi.org/raspbian/archive/$raspbian_version/$n.tar.xz"
-    mkdir -p $(dirname $cache_path)
-    mv /tmp/raspbian-cache.tmp $cache_path
-  fi
-  # TODO run atftpd under a tftp system user.group instead of using nobody.
-  install -d -o root -g nogroup -m 750 /srv/nfs/rpi1{,/$n} # NB the nogroup group is used by atftpd.
-  tar xf $cache_path -C /srv/nfs/rpi1/$n
-done
-mv /srv/nfs/rpi1/{boot,root}
-ln -s /srv/nfs/rpi1/root/boot /srv/tftp/rpi1
-pushd /srv/nfs/rpi1/root/boot
-# we need a recent version of some firmware files to be able to use pxe boot.
-rpi_firmware_revision='0c01dbefba45a08c47f8538d5a071a0fba6b7e83'
-for n in start4.elf fixup4.dat; do
-  wget -q -O $n https://github.com/raspberrypi/firmware/raw/$rpi_firmware_revision/boot/$n
-done
-popd
-
-# configure rpi kernel command line to mount the root fs from our nfs export.
-# NB the default is:
-#     dwc_otg.lpm_enable=0
-#     console=serial0,115200
-#     console=tty1
-#     root=PARTUUID=3b18e43a-02
-#     rootfstype=ext4
-#     elevator=deadline
-#     fsck.repair=yes
-#     rootwait
-#     quiet
-#     init=/usr/lib/raspi-config/init_resize.sh
-#     splash
-#     plymouth.ignore-serial-consoles
-cat | tr '\n' ' ' >/srv/nfs/rpi1/root/boot/cmdline.txt <<'EOF'
-console=serial0,115200
-console=tty1
-root=/dev/nfs
-nfsroot=10.10.10.2:/srv/nfs/rpi1/root,vers=4.1,proto=tcp
-rw
-rootwait
-elevator=deadline
-ip=dhcp
-EOF
-
-# do not mount any partition.
-# NB normally, this mounts them from the sd-card, but we want to be able to run without a sd-card.
-sed -i /PARTUUID=/d /srv/nfs/rpi1/root/etc/fstab
-
-# enable sshd.
-touch /srv/nfs/rpi1/root/boot/ssh
-
-# test downloading a file from our tftp server.
-atftp --get --local-file /tmp/tftp-start4.elf --remote-file rpi1/start4.elf 127.0.0.1
-atftp --get --local-file /tmp/tftp-cmdline.txt --remote-file rpi1/cmdline.txt 127.0.0.1
-
-# configure the nfs share.
-cat >>/etc/exports <<'EOF'
-/srv/nfs/rpi1 10.10.10.0/24(rw,async,no_root_squash,no_subtree_check,insecure)
-EOF
-systemctl reload nfs-kernel-server
+# test access to the NFS server using NFSv3 (UDP and TCP) and NFSv4 (TCP).
+showmount -e localhost
+rpcinfo -u localhost nfs 3
+rpcinfo -t localhost nfs 3
+rpcinfo -t localhost nfs 4

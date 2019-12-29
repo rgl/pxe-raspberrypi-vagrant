@@ -306,3 +306,4 @@ You can also do it from the host by capturing traffic from the `br-rpi` or `vlan
 * https://github.com/raspberrypi/linux
 * https://github.com/pftf
 * https://www.kernel.org/doc/Documentation/filesystems/nfs/nfsroot.txt
+* https://github.com/RPi-Distro/pi-gen
