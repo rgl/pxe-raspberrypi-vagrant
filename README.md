@@ -17,6 +17,8 @@ The tp-link tl-sg108e switch is configured as:
 ![](tp-link-sg108e-802-1q-vlan-configuration.png)
 ![](tp-link-sg108e-802-1q-vlan-pvid-configuration.png)
 
+**NB** this line of switches is somewhat insecure as, at least, its configuration protocol (UDP port 29808 and TCP port 80) uses clear text messages. For more information see [How I can gain control of your TP-LINK home switch](https://www.pentestpartners.com/security-blog/how-i-can-gain-control-of-your-tp-link-home-switch/) and [Information disclosure vulnerability in TP-Link Easy Smart switches](https://www.chrisdcmoore.co.uk/post/tplink-easy-smart-switch-vulnerabilities/).
+
 The host network is configured by netplan with `/etc/netplan/config.yaml` as:
 
 ```yaml
@@ -27,23 +29,51 @@ network:
     enp3s0:
       dhcp4: yes
       nameservers:
+        # NB on ubuntu this normally uses the system-resolved dns resolver and
+        #    you can list the current upstream dns server addresses with:
+        #       systemd-resolve --status
         addresses:
-          - "8.8.8.8"
-          - "8.8.4.4"
+          # cloudflare+apnic public dns resolvers.
+          # see https://en.wikipedia.org/wiki/1.1.1.1
           - "1.1.1.1"
+          - "1.0.0.1"
+          # google public dns resolvers.
+          # see https://en.wikipedia.org/wiki/8.8.8.8
+          #- "8.8.8.8"
+          #- "8.8.4.4"
   bridges:
+    # NB this is equivalent of executing:
+    #       ip link add name br-rpi type bridge
+    #       ip addr flush dev br-rpi
+    #       ip addr add dev br-rpi 10.10.10.1/24
+    #       ip link set dev br-rpi up
+    #       ip addr ls dev br-rpi
+    #       ip -d link show dev br-rpi
+    #       ip route
+    # NB later, you can remove with:
+    #       ip link set dev br-rpi down
+    #       ip link delete dev br-rpi
     br-rpi:
       addresses:
         - "10.10.10.1/24"
       interfaces:
         - vlan2
   vlans:
+    # NB this is equivalent of executing:
+    #       ip link add link enp3s0 vlan2 type vlan proto 802.1q id 2
+    #       ip link set dev vlan2 up
+    #       ip -d link show dev vlan2
+    # NB later, you can remove with:
+    #       ip link set dev vlan2 down
+    #       ip link delete dev vlan2
     vlan2:
       id: 2
       link: enp3s0
 ```
 
 After the above is in place, run `vagrant up gateway` to launch the gateway.
+
+For more information about VLANs see the [IEEE 802.1Q VLAN Tutorial](http://www.microhowto.info/tutorials/802.1q.html).
 
 # Raspbian sd-card
 
@@ -307,3 +337,4 @@ You can also do it from the host by capturing traffic from the `br-rpi` or `vlan
 * https://github.com/pftf
 * https://www.kernel.org/doc/Documentation/filesystems/nfs/nfsroot.txt
 * https://github.com/RPi-Distro/pi-gen
+* [IEEE 802.1Q VLAN Tutorial](http://www.microhowto.info/tutorials/802.1q.html)
