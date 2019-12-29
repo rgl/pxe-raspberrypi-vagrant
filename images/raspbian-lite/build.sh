@@ -25,7 +25,18 @@ if [ ! -f raspbian-lite.img ]; then
         packer build raspbian-lite.json \
             | grep -v '/etc/ld.so.preload cannot be preloaded'
 
+    # zero free the rootfs.
+    # NB this is need until https://github.com/solo-io/packer-builder-arm-image/issues/45 is added.
+    apt-get install -y zerofree
+    device="$(losetup --partscan --show --find output-arm-image/image)"
+    zerofree "${device}p2"
+    losetup --detach "$device"
+
     # TODO use "output_filename": "raspbian-lite.img" inside raspbian-lite.json when its available.
     mv output-arm-image/image raspbian-lite.img
     rmdir output-arm-image
+
+    # also create a zip of it so we can easily burn it with etcher.
+    apt-get install -y zip
+    zip - raspbian-lite.img >raspbian-lite.img.zip
 fi
