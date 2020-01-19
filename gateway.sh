@@ -59,9 +59,9 @@ subnet 10.10.10.0 netmask 255.255.255.0 {
   authoritative;
   default-lease-time 300;
   max-lease-time 300;
-  option domain-name-servers 8.8.8.8, 8.8.4.4;
   option subnet-mask 255.255.255.0;
   option routers 10.10.10.2;
+  option domain-name-servers 10.10.10.2;
   option tftp-server-name "10.10.10.2";
 }
 

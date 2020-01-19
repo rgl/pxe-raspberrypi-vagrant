@@ -21,6 +21,7 @@ Vagrant.configure('2') do |config|
     config.vm.hostname = 'gateway'
     config.vm.network :public_network, ip: '10.10.10.2', dev: 'br-rpi'
     config.vm.provision :shell, path: 'gateway.sh'
+    config.vm.provision :shell, path: 'provision-dns-server.sh'
     config.vm.provision :shell, path: 'provision-packer.sh'
     config.vm.provision :shell, path: 'provision-images.sh'
   end
