@@ -54,6 +54,11 @@ apt-get install -y --no-install-recommends isc-dhcp-server
 cat >/etc/dhcp/dhcpd.conf <<'EOF'
 # TODO only give addresses to rpi devices (mac vendors are dc:a6:32, b8:27:eb).
 
+# NB IPv4 leases are stored at /var/lib/dhcp/dhcpd.leases
+# NB IPv6 leases are stored at /var/lib/dhcp/dhcpd6.leases
+# see dhcp-lease-list(8)
+# see dhcpd.leases(5)
+
 subnet 10.10.10.0 netmask 255.255.255.0 {
   range 10.10.10.100 10.10.10.254;
   authoritative;
@@ -147,17 +152,55 @@ subnet 10.10.10.0 netmask 255.255.255.0 {
 #         Option: (255) End
 #             Option End: 255
 
-# my raspberry pi 4 b.
+# my raspberry pi 4 b #1.
 host rpi1 {
-  hardware ethernet dc:a6:32:27:f5:46;
-  #filename "rpi1/start4.elf"; # NB rpi ignores this (although it requests it). # see https://github.com/raspberrypi/rpi-eeprom/issues/69
-  option host-name "rpi1"; # NB the default raspbian config ignores this.
+  hardware ethernet dc:a6:32:27:e0:37;
+  fixed-address 10.10.10.101;
+
+  # NB rpi 4 ignores this (although it requests it).
+  #    see https://github.com/raspberrypi/rpi-eeprom/issues/69
+  #filename "rpi1/start4.elf";
+
+  # configure the hostname.
+  # NB for this to work the image hostname must be set
+  #    to "localhost" at /etc/hostname AND for avahi-daemon
+  #    to pick the new name it must be restarted from
+  #    /etc/dhclient-enter-hooks.d/99-restart-avahi.
+  # NB the default raspbian hostname is "raspberrypi".
+  option host-name "rpi1";
+  option domain-name "local";
 }
 
-# my raspberry pi 3 b+.
+# my raspberry pi 4 b #2.
+host rpi2 {
+  hardware ethernet dc:a6:32:27:f7:cb;
+  fixed-address 10.10.10.102;
+  option host-name "rpi2";
+  option domain-name "local";
+}
+
+# my raspberry pi 4 b #3.
 host rpi3 {
-  hardware ethernet b8:27:eb:91:72:c3;
-  option host-name "rpi3"; # NB the default raspbian config ignores this.
+  hardware ethernet dc:a6:32:27:f7:fb;
+  fixed-address 10.10.10.103;
+  option host-name "rpi3";
+  option domain-name "local";
+}
+
+# my raspberry pi 4 b #4.
+host rpi4 {
+  hardware ethernet dc:a6:32:27:f7:89;
+  fixed-address 10.10.10.104;
+  option host-name "rpi4";
+  option domain-name "local";
+}
+
+# my raspberry pi 4 b in the joy-it case.
+host rpijoy {
+  hardware ethernet dc:a6:32:27:f5:46;
+  fixed-address 10.10.10.123;
+  option host-name "rpijoy";
+  option domain-name "local";
 }
 
 # run dhcp-event when a lease changes state.
@@ -214,6 +257,11 @@ done
 EOF
 chmod +x /usr/local/sbin/dhcp-event
 systemctl restart isc-dhcp-server
+
+# get the MAC vendor list (used by dhcp-lease-list(8)).
+# NB the upstream is at http://standards-oui.ieee.org/oui/oui.txt
+#    BUT linuxnet.ca version is better taken care of.
+wget -qO- https://linuxnet.ca/ieee/oui.txt.bz2 | bzcat >/usr/local/etc/oui.txt
 
 
 #

@@ -12,8 +12,11 @@ for image in /vagrant/images/*; do
     cd $image && ./build.sh
 done
 
-# install the rpi1 image at the nfs /srv/nfs/rpi1/root
+# install the images at the nfs /srv/nfs/rpiN/root
 # shared directory and configure the nfs server.
 pushd /vagrant/images/raspbian-lite
-./install.sh rpi1
+for i in `seq 4`; do
+    ./install.sh rpi$i
+done
+./install.sh rpijoy
 popd

@@ -69,7 +69,9 @@ rmdir raspbian-lite-mnt-root
 losetup --detach "$device"
 
 # configure the nfs share.
-exportfs -v -o rw,async,no_root_squash,no_subtree_check,insecure 10.10.10.0/24:/srv/nfs/$name
+install -d -m 700 /etc/exports.d
+echo "/srv/nfs/$name 10.10.10.0/24(rw,async,no_root_squash,no_subtree_check,insecure)" >/etc/exports.d/$name.exports
+exportfs -a
 
 # list nfs shares.
 showmount -e localhost
