@@ -64,6 +64,9 @@ XKBOPTIONS=""
 BACKSPACE="guess"
 EOF
 
+# install dig et al.
+apt-get install -y --no-install-recommends dnsutils
+
 # tidy the fs permissions.
 install -d -m 700 -o pi -g pi /home/pi/.ssh
 install -m 600 -o pi -g pi /tmp/authorized_keys /home/pi/.ssh
@@ -74,6 +77,7 @@ set -eux
 
 cat >~/.bash_history <<'EOF'
 vcgencmd measure_temp
+vcgencmd measure_volts
 vcgencmd bootloader_config
 sudo su -l
 EOF
