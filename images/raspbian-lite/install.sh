@@ -54,6 +54,64 @@ sed -i /PARTUUID=/d etc/fstab
 # enable sshd.
 touch boot/ssh
 
+# configure the system to go get its hostname and domain from dhcp.
+# NB dhcpcd will set the hostname from dhcp iif the current hostname is blank,
+#    "localhost", "(null)" or the dhcpcd force_hostname configuration setting
+#    is set to "YES" or "TRUE".
+echo localhost >etc/hostname
+sed -i -E '/127.0.1.1\s+raspberrypi/d' etc/hosts
+# restart the avahi-daemon when we get a hostname from dhcp.
+# NB for some reason avahi-daemon does not pick up the
+#    transient hostname set by dhcp, so we have to
+#    restart it manually.
+# NB the default hooks are at /lib/dhcpcd/dhcpcd-hooks.
+cat >lib/dhcpcd/dhcpcd-hooks/99-restart-avahi <<'EOF'
+# NB execute dhcpcd --variables to see all the available variables.
+# NB to troubleshoot the pi set RUN="yes" inside /etc/dhcp/debug
+#    and uncomment the next line.
+#. /etc/dhcp/debug; hostnamectl >>/tmp/dhclient-script.debug
+
+# the following variables are available in a BOUND event:
+# 
+#   reason='BOUND'
+#   interface='eth0'
+#   new_ip_address='10.10.10.100'
+#   new_host_name='rpi1'
+#   new_network_number='10.10.10.0'
+#   new_subnet_mask='255.255.255.0'
+#   new_broadcast_address='10.10.10.255'
+#   new_routers='10.10.10.2'
+#   new_domain_name='local'
+#   new_domain_search='local'
+#   new_domain_name_servers='8.8.8.8 8.8.4.4'
+#
+# and in a RENEW event:
+#
+#   reason='RENEW'
+#   interface='eth0'
+#   new_ip_address='10.10.10.100'
+#   new_host_name='rpi1'
+#   new_network_number='10.10.10.0'
+#   new_subnet_mask='255.255.255.0'
+#   new_broadcast_address='10.10.10.255'
+#   new_routers='10.10.10.2'
+#   new_domain_name='local'
+#   new_domain_search='local'
+#   new_domain_name_servers='8.8.8.8 8.8.4.4'
+#   old_ip_address='10.10.10.100'
+#   old_host_name='rpi1'
+#   old_network_number='10.10.10.0'
+#   old_subnet_mask='255.255.255.0'
+#   old_broadcast_address='10.10.10.255'
+#   old_routers='10.10.10.2'
+#   old_domain_name='local'
+#   old_domain_name_servers='8.8.8.8 8.8.4.4'
+
+if [ "$reason" = 'BOUND' ] && [ "$interface" = 'eth0' ]; then
+    systemctl restart avahi-daemon
+fi
+EOF
+
 # leave the root directory.
 popd
 
