@@ -68,6 +68,11 @@ zone="
 )
                 IN      NS      a.ns
 $gateway_fqdn.  IN      A       $gateway_ip_address
+rpi1            IN      A       10.10.10.101
+rpi2            IN      A       10.10.10.102
+rpi3            IN      A       10.10.10.103
+rpi4            IN      A       10.10.10.104
+rpijoy          IN      A       10.10.10.123
 "
 zone2sql --zone=<(echo "$zone") --gsqlite | sqlite3 /var/lib/powerdns/pdns.sqlite3
 
@@ -88,6 +93,11 @@ reverse_zone="
 )
                         IN  NS  a.ns
 $reverse_gateway_fqdn.  IN  PTR $gateway_fqdn.
+101                     IN  PTR rpi1.$test_domain.
+102                     IN  PTR rpi2.$test_domain.
+103                     IN  PTR rpi3.$test_domain.
+104                     IN  PTR rpi4.$test_domain.
+123                     IN  PTR rpijoy.$test_domain.
 "
 zone2sql --zone=<(echo "$reverse_zone") --gsqlite | sqlite3 /var/lib/powerdns/pdns.sqlite3
 

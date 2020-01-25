@@ -8,13 +8,13 @@ name="$1"
 device="$(losetup --partscan --read-only --show --find raspbian-lite.img)"
 
 # mount.
-mkdir -p raspbian-lite-mnt-boot && mount "${device}p1" -o ro raspbian-lite-mnt-boot
-mkdir -p raspbian-lite-mnt-root && mount "${device}p2" -o ro raspbian-lite-mnt-root
+mkdir -p /mnt/raspbian-lite-mnt-boot && mount "${device}p1" -o ro /mnt/raspbian-lite-mnt-boot
+mkdir -p /mnt/raspbian-lite-mnt-root && mount "${device}p2" -o ro /mnt/raspbian-lite-mnt-root
 
 # copy to the nfs shared directory.
 install -d -m 750 -o root -g nogroup /srv/nfs/$name
-rsync -a --delete raspbian-lite-mnt-root/ /srv/nfs/$name/root/
-rsync -a --delete raspbian-lite-mnt-boot/ /srv/nfs/$name/root/boot/
+rsync -a --delete /mnt/raspbian-lite-mnt-root/ /srv/nfs/$name/root/
+rsync -a --delete /mnt/raspbian-lite-mnt-boot/ /srv/nfs/$name/root/boot/
 
 #
 # configure the image to boot from nfs.
@@ -51,9 +51,6 @@ EOF
 # NB normally, this mounts them from the sd-card, but we want to be able to run without a sd-card.
 sed -i /PARTUUID=/d etc/fstab
 
-# enable sshd.
-touch boot/ssh
-
 # configure the system to go get its hostname and domain from dhcp.
 # NB dhcpcd will set the hostname from dhcp iif the current hostname is blank,
 #    "localhost", "(null)" or the dhcpcd force_hostname configuration setting
@@ -72,7 +69,7 @@ cat >lib/dhcpcd/dhcpcd-hooks/99-restart-avahi <<'EOF'
 #. /etc/dhcp/debug; hostnamectl >>/tmp/dhclient-script.debug
 
 # the following variables are available in a BOUND event:
-# 
+#
 #   reason='BOUND'
 #   interface='eth0'
 #   new_ip_address='10.10.10.100'
@@ -120,10 +117,10 @@ popd
 sleep 10
 
 # umount.
-umount raspbian-lite-mnt-boot
-umount raspbian-lite-mnt-root
-rmdir raspbian-lite-mnt-boot
-rmdir raspbian-lite-mnt-root
+umount /mnt/raspbian-lite-mnt-boot
+umount /mnt/raspbian-lite-mnt-root
+rmdir /mnt/raspbian-lite-mnt-boot
+rmdir /mnt/raspbian-lite-mnt-root
 losetup --detach "$device"
 
 # configure the nfs share.
@@ -136,7 +133,8 @@ showmount -e localhost
 cat /var/lib/nfs/etab
 
 # configure the tftp share.
-ln -fs /srv/nfs/$name/root/boot /srv/tftp/$name
+rm -f /srv/tftp/$name
+ln -s /srv/nfs/$name/root/boot /srv/tftp/$name
 
 # test downloading a file from our tftp server.
 atftp --get --local-file /tmp/tftp-start4.elf --remote-file $name/start4.elf 127.0.0.1

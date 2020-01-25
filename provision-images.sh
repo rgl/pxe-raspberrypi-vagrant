@@ -3,20 +3,29 @@ set -eux
 
 domain=$(hostname --fqdn)
 
+if [ ! -f /vagrant/tmp/ssh/id_rsa ]; then
+    mkdir -p /vagrant/tmp/ssh
+    ssh-keygen -f /vagrant/tmp/ssh/id_rsa -t rsa -b 2048 -C "$USER@$domain" -N ''
+fi
 if [ ! -f ~/.ssh/id_rsa ]; then
-    ssh-keygen -f ~/.ssh/id_rsa -t rsa -b 2048 -C "$USER@$domain" -N ''
+    install -d -m 700 ~/.ssh
+    cp /vagrant/tmp/ssh/* ~/.ssh
 fi
 
 # build the images.
 for image in /vagrant/images/*; do 
-    cd $image && ./build.sh
+    pushd $image
+    ./build.sh
+    popd
 done
 
-# install the images at the nfs /srv/nfs/rpiN/root
-# shared directory and configure the nfs server.
+# install the images.
+# NB you must use iscsi when you need to use overlayfs, e.g., when hosting
+#    containers file-systems on behalf of docker/moby/containerd.
+flavor='iscsi' # iscsi or nfs.
 pushd /vagrant/images/raspbian-lite
 for i in `seq 4`; do
-    ./install.sh rpi$i
+    ./install-boot-from-$flavor.sh rpi$i
 done
-./install.sh rpijoy
+./install-boot-from-$flavor.sh rpijoy
 popd

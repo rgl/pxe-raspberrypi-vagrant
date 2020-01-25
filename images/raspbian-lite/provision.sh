@@ -7,7 +7,7 @@ export DEBIAN_FRONTEND=noninteractive
 systemctl mask rpi-eeprom-update
 
 # upgrade the system.
-apt-get update -y
+apt-get update
 apt-get dist-upgrade -y
 
 # for pxe booting the raspberry pi 4 use a specific version of the firmware.
@@ -18,6 +18,16 @@ for n in start4.elf fixup4.dat; do
   wget -q -O $n https://github.com/raspberrypi/firmware/raw/$rpi_firmware_revision/boot/$n
 done
 popd
+
+# enable sshd.
+systemctl enable ssh
+
+# configure the system to go get its hostname and domain from dhcp.
+# NB dhcpcd will set the hostname from dhcp iif the current hostname is blank,
+#    "localhost", "(null)" or the dhcpcd force_hostname configuration setting
+#    is set to "YES" or "TRUE".
+echo localhost >/etc/hostname
+sed -i -E '/127.0.1.1\s+raspberrypi/d' /etc/hosts
 
 # install vim.
 apt-get install -y --no-install-recommends vim
@@ -64,8 +74,21 @@ XKBOPTIONS=""
 BACKSPACE="guess"
 EOF
 
+# add support for mounting iscsi targets.
+apt-get install -y --no-install-recommends open-iscsi
+sed -i -E 's,#(INITRD)=.+,\1=Yes,g' /etc/default/raspberrypi-kernel
+# install the initrd binaries needed for mounting an iscsi target.
+# NB this is needed because dpkg-reconfigure raspberrypi-kernel does not
+#    work under packer-builder-arm-image.
+initrd_version='v0.0.0.20200125'
+wget -qO/tmp/raspberrypi-kernel-iscsi-initrd.tgz https://github.com/rgl/raspberrypi-kernel-iscsi-initrd/releases/download/$initrd_version/raspberrypi-kernel-iscsi-initrd.tgz
+tar xf /tmp/raspberrypi-kernel-iscsi-initrd.tgz -C /boot
+
 # install dig et al.
 apt-get install -y --no-install-recommends dnsutils
+
+# install useful tools.
+apt-get install -y --no-install-recommends lsof
 
 # tidy the fs permissions.
 install -d -m 700 -o pi -g pi /home/pi/.ssh

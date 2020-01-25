@@ -29,6 +29,47 @@ EOF
 
 
 #
+# configure the shell.
+
+cat >/etc/profile.d/login.sh <<'EOF'
+[[ "$-" != *i* ]] && return
+export EDITOR=vim
+export PAGER=less
+alias l='ls -lF --color'
+alias ll='l -a'
+alias h='history 25'
+alias j='jobs -l'
+EOF
+
+cat >/etc/inputrc <<'EOF'
+set input-meta on
+set output-meta on
+set show-all-if-ambiguous on
+set completion-ignore-case on
+"\e[A": history-search-backward
+"\e[B": history-search-forward
+"\eOD": backward-word
+"\eOC": forward-word
+EOF
+
+cat >~/.bash_history <<'EOF'
+ssh pi@rpi1.test
+ansible -f 10 -b -m command -a 'vcgencmd measure_temp' cluster
+source /opt/ansible/bin/activate && cd /home/vagrant/rpi-cluster
+EOF
+
+# configure the vagrant user home.
+su vagrant -c bash <<'EOF-VAGRANT'
+set -eux
+
+cat >~/.bash_history <<'EOF'
+ssh pi@rpi1.test
+sudo su -l
+EOF
+EOF-VAGRANT
+
+
+#
 # setup NAT.
 # see https://help.ubuntu.com/community/IptablesHowTo
 
@@ -168,7 +209,7 @@ host rpi1 {
   #    /etc/dhclient-enter-hooks.d/99-restart-avahi.
   # NB the default raspbian hostname is "raspberrypi".
   option host-name "rpi1";
-  option domain-name "local";
+  option domain-name "test";
 }
 
 # my raspberry pi 4 b #2.
@@ -176,7 +217,7 @@ host rpi2 {
   hardware ethernet dc:a6:32:27:f7:cb;
   fixed-address 10.10.10.102;
   option host-name "rpi2";
-  option domain-name "local";
+  option domain-name "test";
 }
 
 # my raspberry pi 4 b #3.
@@ -184,7 +225,7 @@ host rpi3 {
   hardware ethernet dc:a6:32:27:f7:fb;
   fixed-address 10.10.10.103;
   option host-name "rpi3";
-  option domain-name "local";
+  option domain-name "test";
 }
 
 # my raspberry pi 4 b #4.
@@ -192,7 +233,7 @@ host rpi4 {
   hardware ethernet dc:a6:32:27:f7:89;
   fixed-address 10.10.10.104;
   option host-name "rpi4";
-  option domain-name "local";
+  option domain-name "test";
 }
 
 # my raspberry pi 4 b in the joy-it case.
@@ -200,7 +241,7 @@ host rpijoy {
   hardware ethernet dc:a6:32:27:f5:46;
   fixed-address 10.10.10.123;
   option host-name "rpijoy";
-  option domain-name "local";
+  option domain-name "test";
 }
 
 # run dhcp-event when a lease changes state.
@@ -274,6 +315,19 @@ apt-get install -y --no-install-recommends atftp atftpd
 # NB if you need to troubleshoot edit the configuration by adding --verbose=7 --trace
 sed -i -E 's,(USE_INETD=).+,\1false,' /etc/default/atftpd
 systemctl restart atftpd
+
+
+#
+# provision the stgt iSCSI target (aka iSCSI server).
+# see tgtd(8)
+# see http://stgt.sourceforge.net/
+# see https://tools.ietf.org/html/rfc7143
+# TODO use http://linux-iscsi.org/ instead?
+# TODO increase the nic MTU to be more iSCSI friendly.
+# TODO use a dedicated VLAN for storage traffic. make it have higher priority then the others at the switch?
+
+apt-get install -y --no-install-recommends tgt
+systemctl status tgt
 
 
 #
