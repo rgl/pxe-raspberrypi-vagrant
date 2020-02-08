@@ -84,7 +84,9 @@ apt-get install -y --no-install-recommends lsof
 
 # tidy the fs permissions.
 install -d -m 700 -o pi -g pi /home/pi/.ssh
-install -m 600 -o pi -g pi /tmp/authorized_keys /home/pi/.ssh
+
+# install the ssh authorized keys.
+install -m 600 -o pi -g pi /tmp/authorized_keys /home/pi/.ssh/authorized_keys
 
 # configure the pi user home.
 su pi -c bash <<'EOF-PI'

@@ -17,6 +17,23 @@ Vagrant.configure('2') do |config|
     vb.customize ['modifyvm', :id, '--cableconnected1', 'on']
   end
 
+  config.trigger.before :up do |trigger|
+    trigger.run = {
+      inline: '''bash -euc \'
+file_paths=(
+  ~/.ssh/id_rsa.pub
+)
+for file_path in "${file_paths[@]}"; do
+  if [ -f $file_path ]; then
+    mkdir -p tmp
+    cp $file_path tmp
+  fi
+done
+\'
+'''
+    }
+  end
+
   config.vm.define :gateway do |config|
     config.vm.hostname = 'gateway'
     config.vm.network :public_network, ip: '10.10.10.2', dev: 'br-rpi'

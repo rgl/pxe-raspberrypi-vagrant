@@ -62,6 +62,9 @@ EOF
 su vagrant -c bash <<'EOF-VAGRANT'
 set -euxo pipefail
 
+install -d -m 750 ~/.ssh
+cat /vagrant/tmp/id_rsa.pub /vagrant/tmp/id_rsa.pub >>~/.ssh/authorized_keys
+
 cat >~/.bash_history <<'EOF'
 ssh pi@rpi1.test
 sudo su -l

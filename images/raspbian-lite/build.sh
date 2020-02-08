@@ -17,6 +17,12 @@ fi
 
 # build the image if its not there.
 if [ ! -f raspbian-lite.img ]; then
+    # setup the authorized ssh keys.
+    cat \
+        /root/.ssh/id_rsa.pub \
+        /vagrant/tmp/id_rsa.pub \
+        >/tmp/authorized_keys
+
     # NB the grep is for ignoring the harmless error lines:
     #       ERROR: ld.so: object '/usr/lib/arm-linux-gnueabihf/libarmmem-${PLATFORM}.so' from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.
     # NB PACKER_CACHE_DIR=/tmp is needed because packer misbehaves (always downloads an already
