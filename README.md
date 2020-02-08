@@ -91,8 +91,6 @@ apt-get update
 apt-get upgrade -y
 
 # reboot.
-# NB if it does not boot again after you've loaded from NFS you probably need
-#    to download start4.elf fixup4.dat again as done in gateway.sh.
 reboot
 
 # switch to root.
@@ -130,10 +128,10 @@ There are two flash image channels:
 They are stored at `/lib/firmware/raspberrypi/bootloader/*/*.bin` (were installed the `rpi-eeprom-images` package; they are also available at https://github.com/raspberrypi/rpi-eeprom/tree/master/firmware), e.g.:
 
 ```plain
-    /lib/firmware/raspberrypi/bootloader/beta/pieeprom-2019-11-18.bin
-    /lib/firmware/raspberrypi/bootloader/beta/vl805-000137ab.bin
+    /lib/firmware/raspberrypi/bootloader/beta/pieeprom-2020-01-17.bin
+    /lib/firmware/raspberrypi/bootloader/beta/vl805-000137ad.bin
 /lib/firmware/raspberrypi/bootloader/critical/pieeprom-2019-09-10.bin
-/lib/firmware/raspberrypi/bootloader/critical/vl805-000137ab.bin
+/lib/firmware/raspberrypi/bootloader/critical/vl805-000137ad.bin
 ```
 
 To flash a image we use the `rpi-eeprom-update` command.
@@ -141,16 +139,16 @@ To flash a image we use the `rpi-eeprom-update` command.
 For example, to flash a beta bootloader with its default configuration, use:
 
 ```bash
-rpi-eeprom-update -d -f /lib/firmware/raspberrypi/bootloader/beta/pieeprom-2019-11-18.bin
+rpi-eeprom-update -d -f /lib/firmware/raspberrypi/bootloader/beta/pieeprom-2020-01-17.bin
 reboot
 ```
 
 **NB** The above will create the following files in the sd-card `/boot` directory:
 
 ```plain
--rwxr-xr-x  1 root root       65 Dec 10 20:51  pieeprom.sig*
--rwxr-xr-x  1 root root   524288 Dec 10 20:51  pieeprom.upd*
--rwxr-xr-x  1 root root    60820 Dec 10 20:51  recovery.bin*
+-rwxr-xr-x  1 root root       65 Feb  8 16:06 pieeprom.sig*
+-rwxr-xr-x  1 root root   524288 Feb  8 16:06 pieeprom.upd*
+-rwxr-xr-x  1 root root    60820 Feb  8 16:06 recovery.bin*
 ```
 
 **NB** The pi 4 rom will always run `recovery.bin` if it exists, that way, the pi can be recovered by using a recovery sd-card.
@@ -167,12 +165,13 @@ For more details see:
 See which version you have now by executing `rpi-eeprom-update`, e.g.:
 
 ```plain
+BCM2711 detected
 BOOTLOADER: up-to-date
-CURRENT: Mon 18 Nov 2019 11:06:55 AM UTC (1574075215)
- LATEST: Tue 10 Sep 2019 10:41:50 AM UTC (1568112110)
+CURRENT: Fri 17 Jan 17:37:11 UTC 2020 (1579282631)
+ LATEST: Tue 10 Sep 10:41:50 UTC 2019 (1568112110)
 VL805: up-to-date
-CURRENT: 000137ab
- LATEST: 000137ab
+CURRENT: 000137ad
+ LATEST: 000137ad
 ```
 
 To flash a bootloader with customized settings, e.g., to boot from a PXE server:
@@ -182,7 +181,7 @@ To flash a bootloader with customized settings, e.g., to boot from a PXE server:
 vcgencmd bootloader_config
 
 # extract the configuration file.
-cp /lib/firmware/raspberrypi/bootloader/beta/pieeprom-2019-11-18.bin pieeprom.bin
+cp /lib/firmware/raspberrypi/bootloader/beta/pieeprom-2020-01-17.bin pieeprom.bin
 rpi-eeprom-config pieeprom.bin >bootconf.txt
 
 # see the configuration file.

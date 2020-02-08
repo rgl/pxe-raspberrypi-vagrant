@@ -10,15 +10,6 @@ systemctl mask rpi-eeprom-update
 apt-get update
 apt-get dist-upgrade -y
 
-# for pxe booting the raspberry pi 4 use a specific version of the firmware.
-pushd /boot
-# we need a recent version of some firmware files to be able to use pxe boot.
-rpi_firmware_revision='0c01dbefba45a08c47f8538d5a071a0fba6b7e83'
-for n in start4.elf fixup4.dat; do
-  wget -q -O $n https://github.com/raspberrypi/firmware/raw/$rpi_firmware_revision/boot/$n
-done
-popd
-
 # enable sshd.
 systemctl enable ssh
 
@@ -80,7 +71,8 @@ sed -i -E 's,#(INITRD)=.+,\1=Yes,g' /etc/default/raspberrypi-kernel
 # install the initrd binaries needed for mounting an iscsi target.
 # NB this is needed because dpkg-reconfigure raspberrypi-kernel does not
 #    work under packer-builder-arm-image.
-initrd_version='v0.0.0.20200125'
+# NB the initrd must match the kernel version provided by the raspberrypi-kernel package.
+initrd_version='v0.0.0.20200208'
 wget -qO/tmp/raspberrypi-kernel-iscsi-initrd.tgz https://github.com/rgl/raspberrypi-kernel-iscsi-initrd/releases/download/$initrd_version/raspberrypi-kernel-iscsi-initrd.tgz
 tar xf /tmp/raspberrypi-kernel-iscsi-initrd.tgz -C /boot
 
