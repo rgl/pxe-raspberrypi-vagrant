@@ -1,6 +1,6 @@
 #!/bin/bash
 # abort this script on errors.
-set -eux
+set -euxo pipefail
 
 # prevent apt-get et al from opening stdin.
 # NB even with this, you'll still get some warnings that you can ignore:

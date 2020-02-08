@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eux
+set -euxo pipefail
 
 echo 'Defaults env_keep += "DEBIAN_FRONTEND"' >/etc/sudoers.d/env_keep_apt
 chmod 440 /etc/sudoers.d/env_keep_apt
@@ -60,7 +60,7 @@ EOF
 
 # configure the vagrant user home.
 su vagrant -c bash <<'EOF-VAGRANT'
-set -eux
+set -euxo pipefail
 
 cat >~/.bash_history <<'EOF'
 ssh pi@rpi1.test

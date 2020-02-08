@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eux
+set -euxo pipefail
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -88,7 +88,7 @@ install -m 600 -o pi -g pi /tmp/authorized_keys /home/pi/.ssh
 
 # configure the pi user home.
 su pi -c bash <<'EOF-PI'
-set -eux
+set -euxo pipefail
 
 cat >~/.bash_history <<'EOF'
 vcgencmd measure_temp

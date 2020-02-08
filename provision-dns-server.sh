@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eux
+set -euxo pipefail
 
 gateway_fqdn="${1:-gateway.test}"; shift || true
 gateway_ip_address="${1:-10.10.10.2}"; shift || true

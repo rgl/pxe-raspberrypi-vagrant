@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eux
+set -euxo pipefail
 
 # download the image ourselfs to the host.
 # NB these raspberrypi.org images were built with https://github.com/RPi-Distro/pi-gen.
