@@ -4,9 +4,10 @@ set -euxo pipefail
 # download the image ourselfs to the host.
 # NB these raspberrypi.org images were built with https://github.com/RPi-Distro/pi-gen.
 # see https://github.com/solo-io/packer-builder-arm-image/issues/44
-# see https://downloads.raspberrypi.org/raspbian/archive/
-raspbian_url='https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2020-02-07/2020-02-05-raspbian-buster-lite.zip'
-raspbian_sha256='7ed5a6c1b00a2a2ab5716ffa51354547bb1b5a6d5bcb8c996b239f9ecd25292b'
+# see https://downloads.raspberrypi.org/raspbian/release_notes.txt
+# see https://downloads.raspberrypi.org/raspbian_lite/images/
+raspbian_url='https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2020-02-14/2020-02-13-raspbian-buster-lite.zip'
+raspbian_sha256='12ae6e17bf95b6ba83beca61e7394e7411b45eba7e6a520f434b0748ea7370e8'
 raspbian_path='/vagrant/tmp/raspbian-lite.zip'
 if [ ! -f "$raspbian_path" ]; then
     mkdir -p "$(dirname $raspbian_path)"
