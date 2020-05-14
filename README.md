@@ -128,18 +128,18 @@ There are two flash image channels:
 They are stored at `/lib/firmware/raspberrypi/bootloader/*/*.bin` (were installed the `rpi-eeprom-images` package; they are also available at https://github.com/raspberrypi/rpi-eeprom/tree/master/firmware), e.g.:
 
 ```plain
-    /lib/firmware/raspberrypi/bootloader/beta/pieeprom-2020-01-17.bin
+    /lib/firmware/raspberrypi/bootloader/beta/pieeprom-2020-04-16.bin
     /lib/firmware/raspberrypi/bootloader/beta/vl805-000137ad.bin
-/lib/firmware/raspberrypi/bootloader/critical/pieeprom-2019-09-10.bin
+/lib/firmware/raspberrypi/bootloader/critical/pieeprom-2020-04-16.bin
 /lib/firmware/raspberrypi/bootloader/critical/vl805-000137ad.bin
 ```
 
 To flash a image we use the `rpi-eeprom-update` command.
 
-For example, to flash a beta bootloader with its default configuration, use:
+For example, to flash a critical bootloader with its default configuration, use:
 
 ```bash
-rpi-eeprom-update -d -f /lib/firmware/raspberrypi/bootloader/beta/pieeprom-2020-01-17.bin
+rpi-eeprom-update -d -f /lib/firmware/raspberrypi/bootloader/critical/pieeprom-2020-04-16.bin
 reboot
 ```
 
@@ -159,16 +159,18 @@ At the next boot, the upgrade will be applied by `recovery.bin` and when it succ
 
 For more details see:
 
-* https://github.com/raspberrypi/rpi-eeprom/blob/master/firmware/raspberry_pi4_network_boot_beta.md
 * https://github.com/raspberrypi/rpi-eeprom/blob/master/firmware/release-notes.md
+* https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2711_bootloader_config.md
+* https://www.raspberrypi.org/documentation/hardware/raspberrypi/booteeprom.md
 
 See which version you have now by executing `rpi-eeprom-update`, e.g.:
 
 ```plain
 BCM2711 detected
 BOOTLOADER: up-to-date
-CURRENT: Fri 17 Jan 17:37:11 UTC 2020 (1579282631)
- LATEST: Tue 10 Sep 10:41:50 UTC 2019 (1568112110)
+CURRENT: Thu 16 Apr 17:11:26 UTC 2020 (1587057086)
+ LATEST: Thu 16 Apr 17:11:26 UTC 2020 (1587057086)
+ FW DIR: /lib/firmware/raspberrypi/bootloader/critical
 VL805: up-to-date
 CURRENT: 000137ad
  LATEST: 000137ad
@@ -181,7 +183,7 @@ To flash a bootloader with customized settings, e.g., to boot from a PXE server:
 vcgencmd bootloader_config
 
 # extract the configuration file.
-cp /lib/firmware/raspberrypi/bootloader/beta/pieeprom-2020-01-17.bin pieeprom.bin
+cp /lib/firmware/raspberrypi/bootloader/critical/pieeprom-2020-04-16.bin pieeprom.bin
 rpi-eeprom-config pieeprom.bin >bootconf.txt
 
 # see the configuration file.
