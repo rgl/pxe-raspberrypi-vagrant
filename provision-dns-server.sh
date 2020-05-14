@@ -55,7 +55,7 @@ diff -u /etc/powerdns/pdns.conf{.orig,} || true
 
 # load the test zone into the database.
 # NB we use 1m for testing purposes, in real world, this should probably be 10m+.
-zone="
+pdnsutil load-zone $test_domain <(echo "
 \$TTL 1m
 \$ORIGIN $test_domain. ; base domain-name
 @               IN      SOA     a.ns    hostmaster (
@@ -66,21 +66,22 @@ zone="
     3w         ; expire (the slave will ignore this zone if the transfer keeps failing for this long)
     1m         ; minimum (the slave stores negative results for this long)
 )
-                IN      NS      a.ns
+@               IN      NS      a.ns
+a.ns            IN      A       $gateway_ip_address
 $gateway_fqdn.  IN      A       $gateway_ip_address
 rpi1            IN      A       10.10.10.101
 rpi2            IN      A       10.10.10.102
 rpi3            IN      A       10.10.10.103
 rpi4            IN      A       10.10.10.104
 rpijoy          IN      A       10.10.10.123
-"
-zone2sql --zone=<(echo "$zone") --gsqlite | sqlite3 /var/lib/powerdns/pdns.sqlite3
+")
+pdnsutil list-all-zones
 
 # load the reverse test zone into the database.
 # NB we use 1m for testing purposes, in real world, this should probably be 10m+.
 reverse_test_domain="$(python3 -c 'import sys; r = sys.argv[1].split(".")[:-1]; r.reverse(); print("%s.in-addr.arpa" % ".".join(r))' $gateway_ip_address)"
 reverse_gateway_fqdn="$(python3 -c 'import sys; r = sys.argv[1].split("."); r.reverse(); print("%s.in-addr.arpa" % ".".join(r))' $gateway_ip_address)"
-reverse_zone="
+pdnsutil load-zone $reverse_test_domain <(echo "
 \$TTL 1m
 \$ORIGIN $reverse_test_domain. ; base domain-name
 @               IN      SOA     a.ns    hostmaster (
@@ -91,15 +92,16 @@ reverse_zone="
     3w         ; expire (the slave will ignore this zone if the transfer keeps failing for this long)
     1m         ; minimum (the slave stores negative results for this long)
 )
-                        IN  NS  a.ns
+@                       IN  NS  a.ns
+a.ns                    IN  A $gateway_ip_address
 $reverse_gateway_fqdn.  IN  PTR $gateway_fqdn.
 101                     IN  PTR rpi1.$test_domain.
 102                     IN  PTR rpi2.$test_domain.
 103                     IN  PTR rpi3.$test_domain.
 104                     IN  PTR rpi4.$test_domain.
 123                     IN  PTR rpijoy.$test_domain.
-"
-zone2sql --zone=<(echo "$reverse_zone") --gsqlite | sqlite3 /var/lib/powerdns/pdns.sqlite3
+")
+pdnsutil list-all-zones
 
 # start it up.
 systemctl start pdns
