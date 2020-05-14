@@ -1,11 +1,28 @@
 #!/bin/bash
 set -euxo pipefail
 
+# configure apt for not asking interactive questions.
 echo 'Defaults env_keep += "DEBIAN_FRONTEND"' >/etc/sudoers.d/env_keep_apt
 chmod 440 /etc/sudoers.d/env_keep_apt
 export DEBIAN_FRONTEND=noninteractive
+
+# make sure grub can be installed in the current root disk.
+# NB these anwsers were obtained (after installing grub-pc) with:
+#
+#   #sudo debconf-show grub-pc
+#   sudo apt-get install debconf-utils
+#   # this way you can see the comments:
+#   sudo debconf-get-selections
+#   # this way you can just see the values needed for debconf-set-selections:
+#   sudo debconf-get-selections | grep -E '^grub-pc.+\s+' | sort
+debconf-set-selections <<EOF
+grub-pc	grub-pc/install_devices_disks_changed	multiselect	/dev/vda
+grub-pc	grub-pc/install_devices	multiselect	/dev/vda
+EOF
+
+# upgrade the system.
 apt-get update
-apt-get upgrade -y
+apt-get dist-upgrade -y
 
 
 #
