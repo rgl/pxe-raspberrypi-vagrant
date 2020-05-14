@@ -9,6 +9,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # install Packer.
 apt-get install -y unzip
+# NB packer-builder-arm-image is only compatible with packer 1.4.x.
 packer_version=1.4.5
 wget -q -O/tmp/packer_${packer_version}_linux_amd64.zip https://releases.hashicorp.com/packer/${packer_version}/packer_${packer_version}_linux_amd64.zip
 unzip /tmp/packer_${packer_version}_linux_amd64.zip -d /usr/local/bin
