@@ -49,7 +49,23 @@ pushd /srv/nfs/$name/root/boot
 # see https://www.raspberrypi.org/documentation/configuration/config-txt/boot.md
 echo "initramfs $(ls initrd.img-*-v7l+) followkernel" >>config.txt
 
-# configure rpi kernel command line to mount the root fs from our iscsi export.
+# configure the bootloader to use the serial port for diagnostics.
+# NB we also configure it to use the PL011 UART.
+# NB rpi 4b has two serial ports:
+#      1. PL011 UART (aka UART0/ttyAMA0)
+#      2. mini UART (aka UART1/ttyS0)
+#    the config.txt file configures which of them is assigned to the serial
+#    console GPIO pins 14 (TX) and 15 (RX).
+#    see https://www.raspberrypi.org/documentation/configuration/uart.md
+#    see https://github.com/raspberrypi/firmware/blob/dd8cbec5a6d27090e5eb080e13d83c35fdd759f7/boot/overlays/README#L1691-L1702
+cat >>config.txt <<'EOF'
+enable_uart=1
+uart_2ndstage=1
+dtoverlay=miniuart-bt
+EOF
+
+# configure the kernel command line to mount the root fs from our iscsi export.
+# configure to open a virtual terminal console in the PL011 UART serial port.
 # see "Root on iSCSI" at /usr/share/doc/open-iscsi/README.Debian.gz
 # NB the default is:
 #     dwc_otg.lpm_enable=0
@@ -65,7 +81,7 @@ echo "initramfs $(ls initrd.img-*-v7l+) followkernel" >>config.txt
 #     splash
 #     plymouth.ignore-serial-consoles
 (cat | tr '\n' ' ') >cmdline.txt <<EOF
-console=serial0,115200
+console=ttyAMA0,115200
 console=tty1
 root=UUID=$(blkid --probe --match-tag UUID --output value /srv/iscsi/$name.img)
 iscsi_initiator=iqn.2020-01.test:$name

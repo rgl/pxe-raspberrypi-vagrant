@@ -22,7 +22,23 @@ rsync -a --delete /mnt/raspbian-lite-mnt-boot/ /srv/nfs/$name/root/boot/
 # enter the root directory.
 pushd /srv/nfs/$name/root/
 
-# configure rpi kernel command line to mount the root fs from our nfs export.
+# configure the bootloader to use the serial port for diagnostics.
+# NB we also configure it to use the PL011 UART.
+# NB rpi 4b has two serial ports:
+#      1. PL011 UART (aka UART0/ttyAMA0)
+#      2. mini UART (aka UART1/ttyS0)
+#    the config.txt file configures which of them is assigned to the serial
+#    console GPIO pins 14 (TX) and 15 (RX).
+#    see https://www.raspberrypi.org/documentation/configuration/uart.md
+#    see https://github.com/raspberrypi/firmware/blob/dd8cbec5a6d27090e5eb080e13d83c35fdd759f7/boot/overlays/README#L1691-L1702
+cat >>config.txt <<'EOF'
+enable_uart=1
+uart_2ndstage=1
+dtoverlay=miniuart-bt
+EOF
+
+# configure the kernel command line to mount the root fs from our nfs export.
+# configure to open a virtual terminal console in the PL011 UART serial port.
 # NB the default is:
 #     dwc_otg.lpm_enable=0
 #     console=serial0,115200
@@ -37,7 +53,7 @@ pushd /srv/nfs/$name/root/
 #     splash
 #     plymouth.ignore-serial-consoles
 (cat | tr '\n' ' ') >boot/cmdline.txt <<EOF
-console=serial0,115200
+console=ttyAMA0,115200
 console=tty1
 root=/dev/nfs
 nfsroot=10.10.10.2:$PWD,vers=4.1,proto=tcp,port=2049

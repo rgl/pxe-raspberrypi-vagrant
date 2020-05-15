@@ -230,7 +230,7 @@ config.set('all', 'POWER_OFF_ON_HALT', '1')
 # change BOOT_ORDER from 0x1 (sd-boot) to 0x2 (network boot).
 # NB default is 0x1.
 # NB if something goes wrong you can always follow the recovery procedure described at https://www.raspberrypi.org/downloads.
-# see https://github.com/raspberrypi/rpi-eeprom/blob/master/firmware/raspberry_pi4_network_boot_beta.md#boot_order
+# see https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2711_bootloader_config.md
 config.set('all', 'BOOT_ORDER', '0x2')
 # retry forever.
 config.set('all', 'NET_BOOT_MAX_RETRIES', '-1')
