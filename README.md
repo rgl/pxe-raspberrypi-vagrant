@@ -162,6 +162,8 @@ For more details see:
 * https://github.com/raspberrypi/rpi-eeprom/blob/master/firmware/release-notes.md
 * https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2711_bootloader_config.md
 * https://www.raspberrypi.org/documentation/hardware/raspberrypi/booteeprom.md
+* https://leiradel.github.io/2019/01/06/SmartStart.html
+* https://leiradel.github.io/2019/01/20/Raspberry-Pi-Stubs.html
 
 See which version you have now by executing `rpi-eeprom-update`, e.g.:
 
@@ -329,6 +331,8 @@ You can also do it from the host by capturing traffic from the `br-rpi` or `vlan
 * https://www.raspberrypi.org/documentation/hardware/raspberrypi/bootmodes/net_tutorial.md
 * https://www.raspberrypi.org/documentation/hardware/raspberrypi/booteeprom.md
 * https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2711_bootloader_config.md
+* https://leiradel.github.io/2019/01/06/SmartStart.html
+* https://leiradel.github.io/2019/01/20/Raspberry-Pi-Stubs.html
 * https://www.raspberrypi.org/documentation/hardware/raspberrypi/schematics/README.md
 * https://www.raspberrypi.org/documentation/configuration/boot_folder.md
 * https://www.raspberrypi.org/documentation/configuration/
