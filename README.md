@@ -181,7 +181,8 @@ CURRENT: 000137ad
 To flash a bootloader with customized settings, e.g., to boot from a PXE server:
 
 ```bash
-# check the current bootloader config.
+# check the current bootloader version and config.
+vcgencmd bootloader_version
 vcgencmd bootloader_config
 
 # extract the configuration file.
@@ -312,6 +313,7 @@ reboot
 After reboot you should verify that the device is using the expected bootloader configuration:
 
 ```bash
+vcgencmd bootloader_version
 vcgencmd bootloader_config
 ```
 
