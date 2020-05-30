@@ -16,6 +16,6 @@ unzip /tmp/packer_${packer_version}_linux_amd64.zip -d /usr/local/bin
 # install the packer-builder-arm-image plugin.
 # see https://github.com/solo-io/packer-builder-arm-image
 apt-get install -y kpartx qemu-user-static
-wget -q -O/tmp/packer-builder-arm-image https://github.com/solo-io/packer-builder-arm-image/releases/download/v0.1.4.5/packer-builder-arm-image
+wget -q -O/tmp/packer-builder-arm-image https://github.com/solo-io/packer-builder-arm-image/releases/download/v0.1.5/packer-builder-arm-image
 install /tmp/packer-builder-arm-image -m 755 -C /usr/local/bin
 rm /tmp/packer-builder-arm-image
