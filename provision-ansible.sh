@@ -16,6 +16,7 @@ ansible --version
 ansible -m ping localhost
 
 # install the ansible shell completion helpers.
+install -d /etc/bash_completion.d
 apt-get install -y python3-argcomplete
 activate-global-python-argcomplete3
 

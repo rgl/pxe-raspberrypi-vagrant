@@ -11,19 +11,7 @@ default_dns_resolver="$(systemd-resolve --status | awk '/DNS Servers: /{print $3
 # provision the DNS authoritative server.
 # NB this will be controlled by the kubernetes external dns controller.
 
-# these anwsers were obtained (after installing pdns-backend-sqlite3) with:
-#
-#   #sudo debconf-show pdns-backend-sqlite3
-#   sudo apt-get install debconf-utils
-#   # this way you can see the comments:
-#   sudo debconf-get-selections
-#   # this way you can just see the values needed for debconf-set-selections:
-#   sudo debconf-get-selections | grep -E '^pdns-.+\s+' | sort
-debconf-set-selections<<EOF
-pdns-backend-sqlite3 pdns-backend-sqlite3/dbconfig-install boolean true
-EOF
-
-apt-get install -y --no-install-recommends dnsutils pdns-backend-sqlite3
+apt-get install -y --no-install-recommends dnsutils pdns-backend-sqlite3 sqlite3
 
 # stop pdns before changing the configuration.
 systemctl stop pdns
@@ -52,6 +40,17 @@ pdns-set-config webserver-allow-from "$gateway_ip_address/24"
 #pdns-set-config log-dns-queries yes
 # diff the changes.
 diff -u /etc/powerdns/pdns.conf{.orig,} || true
+
+# initialize the sqlite3 database.
+# see https://doc.powerdns.com/authoritative/backends/generic-sqlite3.html
+cat >/etc/powerdns/pdns.d/gsqlite3.conf <<'EOF'
+launch=gsqlite3
+gsqlite3-database=/var/lib/powerdns/pdns.sqlite3
+EOF
+su pdns \
+    -s /bin/bash \
+    -c 'sqlite3 /var/lib/powerdns/pdns.sqlite3' \
+    </usr/share/pdns-backend-sqlite3/schema/schema.sqlite3.sql
 
 # load the test zone into the database.
 # NB we use 1m for testing purposes, in real world, this should probably be 10m+.
