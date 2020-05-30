@@ -227,7 +227,7 @@ host rpi1 {
   #    to "localhost" at /etc/hostname AND for avahi-daemon
   #    to pick the new name it must be restarted from
   #    /etc/dhclient-enter-hooks.d/99-restart-avahi.
-  # NB the default raspbian hostname is "raspberrypi".
+  # NB the default raspios hostname is "raspberrypi".
   option host-name "rpi1";
   option domain-name "test";
 }

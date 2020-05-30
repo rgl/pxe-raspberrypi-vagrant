@@ -72,8 +72,9 @@ sed -i -E 's,#(INITRD)=.+,\1=Yes,g' /etc/default/raspberrypi-kernel
 # NB this is needed because dpkg-reconfigure raspberrypi-kernel does not
 #    work under packer-builder-arm-image.
 # NB the initrd must match the kernel version provided by the raspberrypi-kernel package.
-initrd_version='v0.0.0.20200208'
-wget -qO/tmp/raspberrypi-kernel-iscsi-initrd.tgz https://github.com/rgl/raspberrypi-kernel-iscsi-initrd/releases/download/$initrd_version/raspberrypi-kernel-iscsi-initrd.tgz
+initrd_version='v0.0.0.20200530'
+initrd_kernel_version='4.19.118'
+wget -qO/tmp/raspberrypi-kernel-iscsi-initrd.tgz https://github.com/rgl/raspberrypi-kernel-iscsi-initrd/releases/download/$initrd_version/raspberrypi-kernel-iscsi-initrd-$initrd_kernel_version.tgz
 tar xf /tmp/raspberrypi-kernel-iscsi-initrd.tgz -C /boot
 
 # install dig et al.

@@ -3,18 +3,18 @@ set -euxo pipefail
 
 name="$1"
 
-# create the loop device backed by the raspbian-lite.img image file.
+# create the loop device backed by the raspios-lite.img image file.
 # NB you can known a loop backing file with, e.g., cat /sys/class/block/loop0/loop/backing_file.
-device="$(losetup --partscan --read-only --show --find raspbian-lite.img)"
+device="$(losetup --partscan --read-only --show --find raspios-lite.img)"
 
 # mount.
-mkdir -p /mnt/raspbian-lite-mnt-boot && mount "${device}p1" -o ro /mnt/raspbian-lite-mnt-boot
-mkdir -p /mnt/raspbian-lite-mnt-root && mount "${device}p2" -o ro /mnt/raspbian-lite-mnt-root
+mkdir -p /mnt/raspios-lite-mnt-boot && mount "${device}p1" -o ro /mnt/raspios-lite-mnt-boot
+mkdir -p /mnt/raspios-lite-mnt-root && mount "${device}p2" -o ro /mnt/raspios-lite-mnt-root
 
 # copy to the nfs shared directory.
 install -d -m 750 -o root -g nogroup /srv/nfs/$name
-rsync -a --delete /mnt/raspbian-lite-mnt-root/ /srv/nfs/$name/root/
-rsync -a --delete /mnt/raspbian-lite-mnt-boot/ /srv/nfs/$name/root/boot/
+rsync -a --delete /mnt/raspios-lite-mnt-root/ /srv/nfs/$name/root/
+rsync -a --delete /mnt/raspios-lite-mnt-boot/ /srv/nfs/$name/root/boot/
 
 #
 # configure the image to boot from nfs.
@@ -133,10 +133,10 @@ popd
 sleep 10
 
 # umount.
-umount /mnt/raspbian-lite-mnt-boot
-umount /mnt/raspbian-lite-mnt-root
-rmdir /mnt/raspbian-lite-mnt-boot
-rmdir /mnt/raspbian-lite-mnt-root
+umount /mnt/raspios-lite-mnt-boot
+umount /mnt/raspios-lite-mnt-root
+rmdir /mnt/raspios-lite-mnt-boot
+rmdir /mnt/raspios-lite-mnt-root
 losetup --detach "$device"
 
 # configure the nfs share.

@@ -75,9 +75,13 @@ After the above is in place, run `vagrant up gateway` to launch the gateway.
 
 For more information about VLANs see the [IEEE 802.1Q VLAN Tutorial](http://www.microhowto.info/tutorials/802.1q.html).
 
-# Raspbian sd-card
+# Raspios sd-card
 
-Create a [Raspbian Buster Lite](https://www.raspberrypi.org/downloads/raspbian/) sd-card with [balenaEtcher](https://www.balena.io/etcher/), put it in your pi and boot from it, then configure it with:
+Create a [Raspios Buster Lite](https://www.raspberrypi.org/downloads/raspios/) sd-card with [balenaEtcher](https://www.balena.io/etcher/), put it in your pi and boot from it.
+
+Login with the `pi` username and `raspberry` password.
+
+Then configure it with:
 
 ```bash
 # switch to root.
@@ -169,6 +173,7 @@ See which version you have now by executing `rpi-eeprom-update`, e.g.:
 
 ```plain
 BCM2711 detected
+Dedicated VL805 EEPROM detected
 BOOTLOADER: up-to-date
 CURRENT: Thu 16 Apr 17:11:26 UTC 2020 (1587057086)
  LATEST: Thu 16 Apr 17:11:26 UTC 2020 (1587057086)
@@ -285,7 +290,7 @@ if [ "$(lsblk /dev/mmcblk0p1 -o LABEL | tail -n +2)" == "boot" ]; then
     # partition.
     sd_card_boot_mountpoint="$(lsblk /dev/mmcblk0p1 -o MOUNTPOINT | tail -n +2)"
     if [ "$sd_card_boot_mountpoint" == '/media/pi/boot' ]; then
-        # NB this is normally automatically mounted by raspbian, but we
+        # NB this is normally automatically mounted by raspios, but we
         #    need to re-mount it as root.
         umount /media/pi/boot
         sd_card_boot_mountpoint=''

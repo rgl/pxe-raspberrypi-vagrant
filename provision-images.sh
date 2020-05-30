@@ -23,7 +23,7 @@ done
 # NB you must use iscsi when you need to use overlayfs, e.g., when hosting
 #    containers file-systems on behalf of docker/moby/containerd.
 flavor='iscsi' # iscsi or nfs.
-pushd /vagrant/images/raspbian-lite
+pushd /vagrant/images/raspios-lite
 for i in `seq 4`; do
     ./install-boot-from-$flavor.sh rpi$i
 done

@@ -2,7 +2,8 @@
   "builders": [
     {
       "type": "arm-image",
-      "iso_url": "/vagrant/tmp/raspbian-lite.zip",
+      "image_type": "raspberrypi",
+      "iso_url": "/vagrant/tmp/raspios-lite.zip",
       "iso_checksum_type": "none"
     }
   ],

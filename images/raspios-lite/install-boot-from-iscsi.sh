@@ -3,24 +3,24 @@ set -euxo pipefail
 
 name="$1"
 
-# create the loop device backed by the raspbian-lite.img image file.
+# create the loop device backed by the raspios-lite.img image file.
 # NB you can known a loop backing file with, e.g., cat /sys/class/block/loop0/loop/backing_file.
-device="$(losetup --partscan --read-only --show --find raspbian-lite.img)"
+device="$(losetup --partscan --read-only --show --find raspios-lite.img)"
 
 # mount the boot partition.
-mkdir -p /mnt/raspbian-lite-mnt-boot && mount "${device}p1" -o ro /mnt/raspbian-lite-mnt-boot
+mkdir -p /mnt/raspios-lite-mnt-boot && mount "${device}p1" -o ro /mnt/raspios-lite-mnt-boot
 
 # copy the boot fs to the nfs shared directory.
 install -d -m 750 -o root -g nogroup /srv/nfs/$name/root
-rsync -a --delete /mnt/raspbian-lite-mnt-boot/ /srv/nfs/$name/root/boot/
+rsync -a --delete /mnt/raspios-lite-mnt-boot/ /srv/nfs/$name/root/boot/
 
 # give it a bit of time to settle down before umount and rmdir can work.
 # TODO see how can we wait for umount.
 sleep 10
 
 # umount boot.
-umount /mnt/raspbian-lite-mnt-boot
-rmdir /mnt/raspbian-lite-mnt-boot
+umount /mnt/raspios-lite-mnt-boot
+rmdir /mnt/raspios-lite-mnt-boot
 
 # copy the root fs to the iscsi target directory as an image file.
 install -d -m 750 -o root -g root /srv/iscsi
@@ -104,8 +104,8 @@ popd
 # create the loop device backed by the $name.img image file.
 # NB you can known a loop backing file with, e.g., cat /sys/class/block/loop0/loop/backing_file.
 device="$(losetup --show --find /srv/iscsi/$name.img)"
-mkdir -p /mnt/raspbian-lite-mnt-root && mount "$device" /mnt/raspbian-lite-mnt-root
-pushd /mnt/raspbian-lite-mnt-root
+mkdir -p /mnt/raspios-lite-mnt-root && mount "$device" /mnt/raspios-lite-mnt-root
+pushd /mnt/raspios-lite-mnt-root
 
 # do not mount any partition.
 # NB normally, this mounts them from the sd-card, but we want to be able to run without a sd-card.
@@ -183,8 +183,8 @@ popd
 sleep 10
 
 # umount boot.
-umount /mnt/raspbian-lite-mnt-root
-rmdir /mnt/raspbian-lite-mnt-root
+umount /mnt/raspios-lite-mnt-root
+rmdir /mnt/raspios-lite-mnt-root
 
 # detach the image loop device.
 losetup --detach "$device"
