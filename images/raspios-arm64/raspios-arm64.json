@@ -1,0 +1,22 @@
+{
+  "builders": [
+    {
+      "type": "arm-image",
+      "image_type": "raspberrypi",
+      "qemu_binary": "qemu-aarch64-static",
+      "iso_url": "/vagrant/tmp/raspios-arm64.zip",
+      "iso_checksum_type": "none"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "/tmp/authorized_keys",
+      "destination": "/tmp/authorized_keys"
+    },
+    {
+      "type": "shell",
+      "script": "provision.sh"
+    }
+  ]
+}

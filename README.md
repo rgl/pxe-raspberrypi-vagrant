@@ -71,13 +71,15 @@ network:
       link: enp3s0
 ```
 
+Edit `provision-images.sh` to select which image is installed by default.
+
 After the above is in place, run `vagrant up gateway` to launch the gateway.
 
 For more information about VLANs see the [IEEE 802.1Q VLAN Tutorial](http://www.microhowto.info/tutorials/802.1q.html).
 
 # Raspios sd-card
 
-Create a [Raspios Buster Lite](https://www.raspberrypi.org/downloads/raspios/) sd-card with [balenaEtcher](https://www.balena.io/etcher/), put it in your pi and boot from it.
+Create a [Raspios Lite](https://www.raspberrypi.org/downloads/raspios/) sd-card with [balenaEtcher](https://www.balena.io/etcher/), put it in your pi and boot from it.
 
 Login with the `pi` username and `raspberry` password.
 

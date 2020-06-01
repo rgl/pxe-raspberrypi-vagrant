@@ -22,8 +22,9 @@ done
 # install the images.
 # NB you must use iscsi when you need to use overlayfs, e.g., when hosting
 #    containers file-systems on behalf of docker/moby/containerd.
+image='raspios-lite' # raspios-lite or raspios-arm64
 flavor='iscsi' # iscsi or nfs.
-pushd /vagrant/images/raspios-lite
+pushd /vagrant/images/$image
 for i in `seq 4`; do
     ./install-boot-from-$flavor.sh rpi$i
 done
